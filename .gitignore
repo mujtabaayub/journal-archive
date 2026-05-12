@@ -19,6 +19,9 @@ venv/
 env/
 *.egg-info/
 
+# --- Claude Code ---
+.claude/
+
 # --- IDE / OS ---
 .vscode/
 .idea/
