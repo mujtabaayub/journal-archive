@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($env:PATH)",
+      "PowerShell($env:ANTHROPIC_API_KEY = \"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\"; & \"C:\\\\Users\\\\mujta\\\\Documents\\\\journal-archive\\\\.venv\\\\Scripts\\\\python.exe\" -m src.tag 2>&1 | Select-Object -First 5)"
+    ]
+  }
+}

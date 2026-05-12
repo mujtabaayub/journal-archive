@@ -1,0 +1,25 @@
+# --- Secrets & auth (NEVER commit) ---
+credentials.json
+token.json
+
+# --- Private data ---
+data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
