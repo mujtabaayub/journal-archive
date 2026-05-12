@@ -1,6 +1,7 @@
 # --- Secrets & auth (NEVER commit) ---
 credentials.json
 token.json
+drive_token.json
 
 # --- Private data ---
 data/
