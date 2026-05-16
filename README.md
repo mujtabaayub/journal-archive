@@ -6,6 +6,18 @@ A personal journaling system built on top of Gmail Drafts — extracts, classifi
 
 ---
 
+## Demo
+
+**HTML Archive** — calendar heatmap with filtering by mood, theme, and entry type:
+
+![Journal Archive](GIFs/Journal%20Archive.gif)
+
+**Chat Interface** — ask natural-language questions, grounded in semantically retrieved entries:
+
+![Journal Chat](GIFs/Journal%20Chat.gif)
+
+---
+
 ## What it does
 
 Gmail Drafts used as a private journal → pulled into a local SQLite database → tagged by an LLM → explored through three interfaces:
