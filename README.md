@@ -1,6 +1,6 @@
 # journal-archive
 
-A personal journaling system built on top of Gmail Drafts — extracts, classifies, and makes a years-long writing archive searchable and explorable.
+A system to help me visualize and chat with my Journal — extracts, classifies, and makes a years-long writing archive searchable and explorable.
 
 Wrote this routine to help me semantically map and archive around 3,500+ journal entries that I made from 2010-2026 into a searchable interface. It also uses the Claude Haiku model to help me chat with my Journal, and explore the evolution of my thoughts on different topics over the years.
 
