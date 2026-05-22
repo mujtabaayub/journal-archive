@@ -1,4 +1,4 @@
-# journal-archive
+# Talk to Your Journal
 
 A system to help you visualize and chat with your Journal — extracts, classifies, and makes a years-long writing archive searchable and explorable.
 
