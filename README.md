@@ -22,12 +22,11 @@ Wrote this routine to help me semantically map and archive around 3,500+ journal
 
 ## What it does
 
-Gmail Drafts used as a private journal → pulled into a local SQLite database → tagged by an LLM → explored through three interfaces:
+Gmail Drafts used as a private journal → pulled into a local SQLite database → tagged by an LLM → explored through two interfaces:
 
 | Interface | Description |
 |-----------|-------------|
-| **HTML archive** | Self-contained, offline-ready browser app with calendar heatmap, filters, and full-text search |
-| **Streamlit app** | Local analytics dashboard — mood trends, theme frequency, word volume by year |
+| **HTML archive** | Self-contained, offline-ready browser app — calendar heatmap, filters, full-text search, built-in analytics (mood trends, theme frequency, writing volume), pivotal entries, dark mode |
 | **Chat interface** | Ask natural-language questions about your journal; answers are grounded in semantically retrieved entries |
 
 ---
@@ -47,9 +46,8 @@ src/tag.py          Phase 2 — Claude API classifies each entry:
     ▼
 src/embed.py        Phase 3 — Sentence-transformer embeddings for semantic search
     │
-    ├──▶ src/export.py    → data/journal.html  (self-contained archive, ~6 MB)
+    ├──▶ src/export.py    → data/journal.html  (self-contained archive + analytics, ~6 MB)
     └──▶ src/server.py    → http://localhost:5000  (Flask chat app)
-         src/app.py       → http://localhost:8501  (Streamlit analytics)
 ```
 
 ---
@@ -61,7 +59,6 @@ src/embed.py        Phase 3 — Sentence-transformer embeddings for semantic sea
 - **Anthropic Claude** — entry classification and chat
 - **Sentence Transformers** (`all-MiniLM-L6-v2`) — semantic embeddings
 - **Flask** — chat API server
-- **Streamlit + Plotly** — analytics UI
 - **Google Drive API** — optional HTML archive upload
 
 ---
@@ -117,13 +114,12 @@ python -m src.export
 ## Running the interfaces
 
 ```bash
+# HTML archive (browse, search, analytics) — just open it:
+data/journal.html
+
 # Chat app (Flask)
 python -m src.server
 # → http://localhost:5000
-
-# Analytics dashboard (Streamlit)
-streamlit run src/app.py
-# → http://localhost:8501
 ```
 
 ---
@@ -136,9 +132,8 @@ journal-archive/
 │   ├── extract.py      Phase 1: Gmail → SQLite
 │   ├── tag.py          Phase 2: Claude tagging + FTS5
 │   ├── embed.py        Phase 3: Sentence-transformer embeddings
-│   ├── export.py       Phase 4a: HTML archive generator
+│   ├── export.py       Phase 4a: HTML archive generator (incl. analytics)
 │   ├── server.py       Phase 4b: Flask chat server
-│   ├── app.py          Phase 4c: Streamlit analytics
 │   ├── gdrive.py       Google Drive upload helper
 │   └── chat.py         Chat utilities
 ├── data/               ← gitignored (your private archive lives here)
