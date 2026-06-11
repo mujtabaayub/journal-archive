@@ -10,9 +10,13 @@ Wrote this routine to help me semantically map and archive around 3,500+ journal
 
 ## Demo
 
-**HTML Archive** — calendar heatmap with filtering by mood, theme, and entry type:
+**HTML Archive** — stats dashboard with per-year writing volume:
 
-![Journal Archive](GIFs/Journal%20Archive.gif)
+![Journal Archive insights](GIFs/Screenshot%201.png)
+
+**Built-in analytics** — themes, moods, and writing patterns over the years:
+
+![Journal Archive analytics](GIFs/Screenshot%202.png)
 
 **Chat Interface** — ask natural-language questions, grounded in semantically retrieved entries:
 
