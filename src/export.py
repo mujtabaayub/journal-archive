@@ -196,6 +196,33 @@ header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg2)
 .cd.h3{background:var(--heat3);color:#fff;cursor:pointer;font-weight:700}
 .cd.h1:hover,.cd.h2:hover,.cd.h3:hover{transform:scale(1.25)}
 .cd.dim{opacity:.13}
+.cd.sel{outline:2px solid var(--accent);outline-offset:1px;font-weight:700}
+
+/* ── Calendar split layout + reader ── */
+#cal-layout{display:flex;gap:18px;align-items:flex-start}
+#cal-left{flex:1;min-width:0}
+#reader{width:400px;min-width:300px;position:sticky;top:120px;
+  max-height:calc(100vh - 140px);display:none;flex-direction:column;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden}
+#reader.show{display:flex}
+#reader-hd{display:flex;align-items:center;gap:8px;padding:12px 14px;
+  border-bottom:1px solid var(--line);flex-shrink:0}
+#reader-date{font-family:var(--serif);font-weight:700;font-size:.98em;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rnav{border:1px solid var(--line);background:var(--bg);border-radius:8px;
+  width:28px;height:28px;cursor:pointer;font-size:.9em;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rnav:hover{color:var(--accent);border-color:var(--accent)}
+#reader-body{overflow-y:auto;padding:12px 14px 20px}
+#reader-body .card{padding:13px 15px;margin-bottom:10px}
+#reader-body .cbody{font-size:.9em;line-height:1.8}
+#reader-hint{font-size:.78em;color:var(--muted);font-style:italic;padding:4px 0}
+@media(max-width:900px){
+  #reader{position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;min-width:0;
+    max-height:62vh;border-radius:16px 16px 0 0;z-index:180;
+    box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+}
 
 /* ── Cards ── */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
@@ -317,8 +344,20 @@ header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg2)
       <span class="leg"><span class="dot" style="background:var(--heat2)"></span>2&ndash;3</span>
       <span class="leg"><span class="dot" style="background:var(--heat3)"></span>4+</span>
       <span class="leg" id="leg-dim" style="display:none"><span class="dot" style="background:var(--heat0)"></span>no match</span>
+      <span class="leg" id="reader-hint">&larr; Click a highlighted day to read its entries here</span>
     </div>
-    <div id="cal"></div>
+    <div id="cal-layout">
+      <div id="cal-left"><div id="cal"></div></div>
+      <aside id="reader">
+        <div id="reader-hd">
+          <button class="rnav" onclick="stepDay(-1)" title="Previous day with entries">&lsaquo;</button>
+          <span id="reader-date"></span>
+          <button class="rnav" onclick="stepDay(1)" title="Next day with entries">&rsaquo;</button>
+          <button class="rnav" onclick="closeReader()" title="Close">&times;</button>
+        </div>
+        <div id="reader-body"></div>
+      </aside>
+    </div>
   </div>
 
   <div class="view" id="v-browse">
@@ -483,7 +522,50 @@ function updateCalendar(){
     el.classList.toggle('dim',!matches.has(el.dataset.date));
   });
 }
-function pickDay(d){S.date=d;S.shown=PAGE;setView('browse');refresh()}
+// ── Day reader (calendar sidebar) ──────────────────────────────────────────
+let RDATE=null;
+const DAYLIST=Object.keys(counts).sort();
+function pickDay(d){
+  if(RDATE===d){closeReader();return}
+  RDATE=d;
+  renderReader();
+}
+function renderReader(){
+  document.querySelectorAll('.cd.sel').forEach(el=>el.classList.remove('sel'));
+  const cell=document.querySelector('.cd[data-date="'+RDATE+'"]');
+  if(cell){
+    cell.classList.add('sel');
+    const yr=document.getElementById('yr-'+RDATE.slice(0,4));
+    if(yr&&!yr.classList.contains('open'))yr.classList.add('open');
+  }
+  const res=E.filter(e=>e.date===RDATE);
+  const [y,m,d]=RDATE.split('-').map(Number);
+  document.getElementById('reader-date').textContent=
+    MONTHS_F[m-1]+' '+d+', '+y+(res.length>1?' · '+res.length+' entries':'');
+  const body=document.getElementById('reader-body');
+  body.innerHTML=res.map(card).join('')||'<div class="empty">No entries this day.</div>';
+  if(res.length===1){
+    const btn=body.querySelector('.ctog');
+    if(btn)togBody(btn);
+  }
+  body.scrollTop=0;
+  document.getElementById('reader').classList.add('show');
+  document.getElementById('reader-hint').style.display='none';
+}
+function closeReader(){
+  RDATE=null;
+  document.querySelectorAll('.cd.sel').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('reader').classList.remove('show');
+}
+function stepDay(dir){
+  if(!RDATE)return;
+  const i=DAYLIST.indexOf(RDATE)+dir;
+  if(i<0||i>=DAYLIST.length)return;
+  RDATE=DAYLIST[i];
+  renderReader();
+  const cell=document.querySelector('.cd[data-date="'+RDATE+'"]');
+  if(cell)cell.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
 
 // Browse -------------------------------------------------------------------
 function sortEntries(arr){
@@ -531,7 +613,11 @@ document.addEventListener('keydown',e=>{
   if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){
     e.preventDefault();document.getElementById('search').focus();
   }
-  if(e.key==='Escape'){closeModal();closeDrawer()}
+  if(e.key==='Escape'){
+    const m=document.getElementById('modal').classList.contains('show');
+    const d=document.getElementById('drawer').classList.contains('show');
+    if(m)closeModal();else if(d)closeDrawer();else closeReader();
+  }
 });
 
 function buildDrawer(){
