@@ -923,6 +923,33 @@ def main() -> None:
     except Exception as e:
         print(f"Drive upload skipped: {e}")
 
+    deploy_pages()
+
+
+def deploy_pages() -> None:
+    """Deploy to Cloudflare Pages (https://journal-archive.pages.dev, behind Access)."""
+    import os
+    import shutil
+    import subprocess
+
+    deploy_dir = ROOT / "deploy"
+    try:
+        deploy_dir.mkdir(exist_ok=True)
+        shutil.copyfile(OUT_PATH, deploy_dir / "index.html")
+        print("Deploying to Cloudflare Pages...")
+        env = dict(os.environ)
+        nodejs = r"C:\Program Files\nodejs"
+        if os.path.isdir(nodejs) and nodejs not in env.get("PATH", ""):
+            env["PATH"] = nodejs + os.pathsep + env.get("PATH", "")
+        subprocess.run(
+            f'npx --yes wrangler pages deploy "{deploy_dir}" '
+            "--project-name=journal-archive --branch=main --commit-dirty=true",
+            check=True, cwd=str(ROOT), shell=True, env=env,
+        )
+        print("Cloudflare Pages: https://journal-archive.pages.dev")
+    except Exception as e:
+        print(f"Pages deploy skipped: {e}")
+
 
 if __name__ == "__main__":
     main()

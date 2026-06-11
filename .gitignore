@@ -5,6 +5,7 @@ drive_token.json
 
 # --- Private data ---
 data/
+deploy/
 *.db
 *.db-journal
 *.sqlite
