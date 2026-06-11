@@ -32,8 +32,12 @@ def _get_service():
         creds = Credentials.from_authorized_user_file(str(DRIVE_TOKEN_PATH), SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                print(f"Drive token refresh failed ({e}); starting fresh consent flow...")
+                creds = None
+        if not creds or not creds.valid:
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_PATH), SCOPES)
             creds = flow.run_local_server(host="127.0.0.1", port=8085)
         DRIVE_TOKEN_PATH.write_text(creds.to_json())

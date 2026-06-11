@@ -71,6 +71,12 @@ def index() -> Response:
     return Response(HTML, mimetype="text/html")
 
 
+MODELS = {
+    "standard": "claude-sonnet-4-6",
+    "deep": "claude-opus-4-8",
+}
+
+
 @app.route("/chat", methods=["POST"])
 def chat() -> Response:
     print(">>> /chat called", flush=True)
@@ -78,14 +84,16 @@ def chat() -> Response:
         data = request.json
         session_id = data.get("session", "default")
         question = data.get("question", "").strip()
-        print(f">>> question: {question}", flush=True)
+        mode = data.get("mode") if data.get("mode") in MODELS else "standard"
+        model = MODELS[mode]
+        print(f">>> question ({mode}): {question}", flush=True)
 
         if not question:
             return jsonify({"error": "Empty question"}), 400
 
         history = sessions.setdefault(session_id, [])
 
-        entries = search(question)
+        entries = search(question, limit=25 if mode == "deep" else 15)
         print(f">>> {len(entries)} entries found", flush=True)
         context = format_entries(entries) if entries else "No relevant entries found."
 
@@ -94,14 +102,19 @@ def chat() -> Response:
             "content": f"Journal entries relevant to my question:\n\n{context}\n\n---\n\nMy question: {question}",
         })
 
-        print(">>> calling Claude...", flush=True)
+        print(f">>> calling Claude ({model})...", flush=True)
+        kwargs = {}
+        if mode == "deep":
+            kwargs["thinking"] = {"type": "adaptive"}
+            kwargs["output_config"] = {"effort": "high"}
         resp = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=1024,
-            system=SYSTEM,
+            model=model,
+            max_tokens=8000 if mode == "deep" else 2048,
+            system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
             messages=history,
+            **kwargs,
         )
-        answer = resp.content[0].text
+        answer = next(b.text for b in resp.content if b.type == "text")
         history.append({"role": "assistant", "content": answer})
         print(">>> done", flush=True)
         return jsonify({"answer": answer, "sources": len(entries)})
@@ -136,6 +149,11 @@ header span{font-size:0.78em;color:#aaa}
 #new-btn{font-size:0.78em;padding:5px 12px;border:1px solid #ddd;border-radius:6px;
   background:#fafaf8;cursor:pointer;color:#666}
 #new-btn:hover{background:#eee}
+#deep-lbl{font-size:0.78em;color:#666;display:flex;align-items:center;gap:5px;
+  cursor:pointer;user-select:none;border:1px solid #ddd;border-radius:6px;
+  padding:5px 10px;background:#fafaf8}
+#deep-lbl:has(input:checked){background:#1a5a8a;color:#fff;border-color:#1a5a8a}
+#deep-lbl input{accent-color:#fff;margin:0}
 #messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px}
 .msg{max-width:720px;line-height:1.7}
 .msg.user{align-self:flex-end;background:#1a5a8a;color:#fff;
@@ -163,6 +181,9 @@ header span{font-size:0.78em;color:#aaa}
   <h1>&#128211; Journal Chat</h1>
   <div style="display:flex;align-items:center;gap:12px">
     <span id="src-hint"></span>
+    <label id="deep-lbl" title="Deep mode: Opus with extended thinking — slower, costlier, much better for reflective questions">
+      <input type="checkbox" id="deep"> Deep mode
+    </label>
     <button id="new-btn" onclick="newChat()">New conversation</button>
   </div>
 </header>
@@ -215,7 +236,8 @@ async function send(){
 
   try{
     const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({session:SESSION,question:q})});
+      body:JSON.stringify({session:SESSION,question:q,
+        mode:document.getElementById("deep").checked?"deep":"standard"})});
     const data=await r.json();
     typing.remove();
     addMsg("assistant",data.answer,data.sources);

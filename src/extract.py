@@ -46,8 +46,12 @@ def get_service():
         creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                print(f"Token refresh failed ({e}); starting fresh consent flow...")
+                creds = None
+        if not creds or not creds.valid:
             if not CREDENTIALS_PATH.exists():
                 sys.exit(
                     f"Missing {CREDENTIALS_PATH}. See README for setup instructions."
