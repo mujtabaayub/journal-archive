@@ -100,7 +100,7 @@ mark{background:var(--gold-soft);color:var(--gold);border-radius:3px;padding:0 2
 /* ── Header ── */
 header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg2) 88%,transparent);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.hd-row{max-width:1100px;margin:0 auto;padding:14px 20px 10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hd-row{max-width:1240px;margin:0 auto;padding:14px 20px 10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .brand{display:flex;flex-direction:column;gap:1px;margin-right:auto}
 .brand h1{font-family:var(--serif);font-size:1.35em;font-weight:700;letter-spacing:-.01em}
 .brand .sub{font-size:.72em;color:var(--muted)}
@@ -118,7 +118,7 @@ header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg2)
 .iconbtn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;padding:0;font-size:1em}
 
 /* tabs */
-.tabs{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs{max-width:1240px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{border:none;background:none;padding:9px 14px 11px;font-size:.85em;color:var(--muted);cursor:pointer;
   border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
@@ -127,12 +127,12 @@ header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg2)
 .tab .n{font-size:.82em;color:var(--muted);margin-left:4px}
 
 /* ── Layout ── */
-#wrap{max-width:1100px;margin:0 auto;padding:22px 20px 90px}
+#wrap{max-width:1240px;margin:0 auto;padding:22px 20px 90px}
 .view{display:none}.view.on{display:block;animation:fade .25s ease}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* chips */
-#chips{display:none;max-width:1100px;margin:0 auto;padding:10px 20px 0;gap:6px;flex-wrap:wrap;align-items:center}
+#chips{display:none;max-width:1240px;margin:0 auto;padding:10px 20px 0;gap:6px;flex-wrap:wrap;align-items:center}
 #chips.show{display:flex}
 .chip{font-size:.76em;background:var(--accent-soft);color:var(--accent-ink);border:1px solid transparent;
   border-radius:99px;padding:4px 6px 4px 11px;display:inline-flex;align-items:center;gap:6px}
@@ -201,7 +201,7 @@ header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg2)
 /* ── Calendar split layout + reader ── */
 #cal-layout{display:flex;gap:18px;align-items:flex-start}
 #cal-left{flex:1;min-width:0}
-#reader{width:400px;min-width:300px;position:sticky;top:120px;
+#reader{width:520px;min-width:340px;position:sticky;top:120px;
   max-height:calc(100vh - 140px);display:none;flex-direction:column;
   background:var(--card);border:1px solid var(--line);border-radius:14px;
   box-shadow:var(--shadow);overflow:hidden}
